@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EducAid — Super Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--green:#1B5E3B;--green-light:#EAF2EC;--navy:#0C1F4A;--navy-light:#E8EDF8;--white:#FFFFFF;--canvas:#F7F8F5;--grey:#6B7280;--grey-mid:#9CA3AF;--border:#D1D5DB;--red:#B91C1C;--red-light:#FEE2E2;--amber:#B45309;--amber-light:#FEF3C7;--purple:#6D28D9;--teal:#0E7490;--black:#0A0C10;--shadow:rgba(12,31,74,0.08);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--canvas);color:var(--black);min-height:100vh;}
+  .hide{display:none!important;}
+  .btn{border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+
+  /* Login */
+  #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#0C1F4A 0%,#0F3D26 100%);}
+  .login-card{background:var(--white);border-radius:24px;padding:48px 40px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+  .login-logo{width:64px;height:64px;background:var(--navy);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;}
+  .login-title{font-family:'DM Serif Display',serif;font-size:28px;color:var(--navy);text-align:center;margin-bottom:6px;}
+  .login-sub{font-size:13px;color:var(--grey);text-align:center;margin-bottom:32px;}
+  .lbl{font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px;display:block;}
+  .inp{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:'DM Sans',sans-serif;background:var(--canvas);color:var(--black);outline:none;transition:border-color 0.2s;margin-bottom:20px;}
+  .inp:focus{border-color:var(--navy);background:var(--white);}
+  .btn-primary{width:100%;padding:16px;background:var(--navy);color:var(--white);border-radius:14px;font-size:16px;font-weight:700;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(12,31,74,0.28);transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+  .btn-primary:hover{opacity:0.9;}
+
+  /* Dashboard */
+  #dashboard{display:none;min-height:100vh;}
+  .dash-header{background:var(--white);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px var(--shadow);}
+  .hdr-back{width:36px;height:36px;border-radius:10px;background:var(--canvas);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--navy);flex-shrink:0;display:none;}
+  .hdr-title{font-size:18px;font-weight:800;color:var(--navy);}
+  .hdr-sub{font-size:12px;color:var(--grey);margin-top:1px;}
+  .hdr-signout{margin-left:auto;padding:8px 14px;background:var(--canvas);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:var(--grey);cursor:pointer;transition:all 0.2s;}
+  .hdr-signout:hover{background:var(--red-light);color:var(--red);border-color:var(--red);}
+
+  .stats-strip{display:flex;background:var(--white);border-bottom:1px solid var(--border);}
+  .stat-item{flex:1;padding:14px;text-align:center;border-right:1px solid var(--border);cursor:pointer;transition:background 0.2s;}
+  .stat-item:last-child{border-right:none;}
+  .stat-item:hover{background:var(--canvas);}
+  .stat-num{font-size:22px;font-weight:900;color:var(--navy);}
+  .stat-num.green{color:var(--green);}
+  .stat-num.red{color:var(--red);}
+  .stat-lbl{font-size:10px;color:var(--grey);font-weight:600;margin-top:2px;}
+
+  .tab-bar{display:flex;background:var(--white);border-bottom:1px solid var(--border);}
+  .tab-item{flex:1;padding:12px;text-align:center;font-size:12px;font-weight:600;color:var(--grey);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;}
+  .tab-item.active{color:var(--navy);border-bottom-color:var(--navy);}
+
+  .dash-content{padding:20px;max-width:900px;margin:0 auto;}
+  .sec-head{font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px;margin-top:4px;}
+
+  .new-btn{width:100%;padding:14px;background:var(--green-light);border:1px solid rgba(27,94,59,0.27);border-radius:12px;color:var(--green);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+  .new-btn:hover{background:var(--green);color:var(--white);}
+
+  /* School card */
+  .school-card{background:var(--white);border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid var(--border);transition:all 0.2s;}
+  .school-card:hover{box-shadow:0 4px 16px var(--shadow);}
+  .school-card-row{display:flex;align-items:center;gap:14px;}
+  .school-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+  .school-name{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:2px;}
+  .school-sub{font-size:12px;color:var(--grey);}
+  .school-meta{font-size:11px;color:var(--grey-mid);margin-top:2px;}
+  .school-actions{display:flex;gap:8px;margin-left:auto;}
+  .view-btn{padding:8px 14px;background:var(--navy-light);border:1px solid rgba(12,31,74,0.2);border-radius:8px;font-size:12px;font-weight:700;color:var(--navy);cursor:pointer;transition:all 0.2s;white-space:nowrap;font-family:'DM Sans',sans-serif;}
+  .view-btn:hover{background:var(--navy);color:var(--white);}
+  .del-btn{width:36px;height:36px;border-radius:10px;background:var(--red-light);border:1px solid rgba(185,28,28,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all 0.2s;flex-shrink:0;}
+  .del-btn:hover{background:var(--red);}
+
+  /* School detail view */
+  #schoolDetail{display:none;min-height:100vh;}
+  .detail-school-badge{background:var(--white);border-left:4px solid var(--green);border-radius:14px;padding:16px;margin-bottom:20px;border:1px solid var(--border);}
+  .detail-school-name{font-size:18px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+  .detail-school-sub{font-size:12px;color:var(--grey);}
+
+  .detail-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+  .detail-tab{padding:8px 16px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);font-size:12px;font-weight:600;color:var(--grey);cursor:pointer;transition:all 0.2s;}
+  .detail-tab:hover{border-color:var(--navy);color:var(--navy);}
+  .detail-tab.active{background:var(--navy);border-color:var(--navy);color:var(--white);}
+
+  /* Class group */
+  .class-group{background:var(--white);border-radius:14px;border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
+  .class-group-header{padding:14px 16px;background:var(--navy-light);display:flex;align-items:center;gap:10px;cursor:pointer;}
+  .class-group-name{font-size:14px;font-weight:700;color:var(--navy);}
+  .class-group-count{font-size:11px;color:var(--grey);margin-left:auto;}
+  .class-group-body{padding:8px;}
+
+  /* Student row */
+  .student-row{display:flex;align-items:center;padding:10px;gap:12px;border-radius:10px;transition:background 0.2s;cursor:pointer;}
+  .student-row:hover{background:var(--canvas);}
+  .st-avatar{width:36px;height:36px;border-radius:10px;background:var(--navy);display:flex;align-items:center;justify-content:center;color:var(--white);font-size:12px;font-weight:800;flex-shrink:0;}
+  .st-name{font-size:14px;font-weight:700;color:var(--navy);}
+  .st-code{font-size:11px;color:var(--grey);}
+  .st-expand{margin-left:auto;color:var(--grey-mid);font-size:16px;}
+
+  /* Student detail */
+  .student-detail{background:var(--canvas);border-radius:10px;padding:12px;margin:4px 0 8px;display:none;}
+  .student-detail.open{display:block;}
+  .detail-section{margin-bottom:12px;}
+  .detail-section-title{font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+  .detail-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;}
+  .detail-item:last-child{border-bottom:none;}
+  .detail-item-label{color:var(--grey);}
+  .detail-item-value{font-weight:600;color:var(--navy);}
+
+  /* Data cards */
+  .data-card{display:flex;align-items:center;background:var(--white);border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid var(--border);border-left:3px solid;gap:12px;}
+  .card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px;}
+  .card-sub{font-size:11px;color:var(--grey);}
+  .badge{padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;border:1px solid;}
+  .grade-box{background:var(--navy-light);border-radius:8px;padding:8px;text-align:center;min-width:48px;flex-shrink:0;}
+  .grade-num{font-size:16px;font-weight:900;color:var(--navy);}
+  .grade-letter{font-size:10px;color:var(--grey);margin-top:1px;}
+
+  /* Pending */
+  .pending-card{display:flex;align-items:center;background:var(--white);border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid var(--border);border-left:3px solid var(--amber);gap:14px;}
+  .list-avatar{width:38px;height:38px;border-radius:12px;background:var(--navy);display:flex;align-items:center;justify-content:center;color:var(--white);font-size:13px;font-weight:800;flex-shrink:0;}
+  .approve-btn{padding:10px 14px;background:var(--green-light);border:1px solid rgba(27,94,59,0.27);border-radius:10px;font-size:13px;font-weight:700;color:var(--green);cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+  .approve-btn:hover{background:var(--green);color:var(--white);}
+
+  .empty-state{text-align:center;padding:40px;background:var(--white);border-radius:14px;border:1px solid var(--border);}
+  .empty-icon{font-size:32px;margin-bottom:10px;}
+  .empty-txt{color:var(--grey);font-size:13px;}
+
+  /* Modal */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:flex-end;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--white);border-radius:24px 24px 0 0;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;padding:32px 24px 48px;animation:slideUp 0.3s ease;}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .modal-title{font-family:'DM Serif Display',serif;font-size:24px;color:var(--navy);margin-bottom:24px;}
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--grey);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:24px;padding:8px 12px;background:var(--canvas);border-radius:10px;border:1px solid var(--border);}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+  .pill{padding:8px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);font-size:13px;font-weight:600;color:var(--grey);cursor:pointer;transition:all 0.2s;}
+  .pill.on{background:var(--navy);border-color:var(--navy);color:var(--white);}
+  .toggle-row{display:flex;gap:10px;margin-bottom:20px;}
+  .toggle-btn{flex:1;padding:12px;border:1.5px solid var(--border);border-radius:12px;background:var(--white);font-size:13px;font-weight:600;color:var(--grey);cursor:pointer;text-align:center;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+  .toggle-btn.on{background:var(--navy);border-color:var(--navy);color:var(--white);}
+  .sec-label{font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin:16px 0 12px;}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:var(--white);padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;z-index:999;display:none;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+  .toast.ok{background:var(--green);}
+  .toast.err{background:var(--red);}
+  .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin 0.8s linear infinite;margin:40px auto;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media(max-width:480px){.login-card{padding:32px 20px;}.dash-content{padding:14px;}}
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">👑</div>
+    <h1 class="login-title">Super Admin</h1>
+    <p class="login-sub">Platform management & school registration</p>
+    <label class="lbl">Email Address</label>
+    <input id="lEmail" class="inp" type="email" placeholder="your@email.com">
+    <label class="lbl">Password</label>
+    <input id="lPwd" class="inp" type="password" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-primary" onclick="doLogin()">Sign In →</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="dash-header">
+    <div class="hdr-back" id="hdrBack" onclick="backToDash()">←</div>
+    <div>
+      <div class="hdr-title" id="hdrTitle">👑 Super Admin</div>
+      <div class="hdr-sub" id="hdrSub">EducAid Platform Management</div>
+    </div>
+    <button class="hdr-signout" onclick="signOut()">Sign Out</button>
+  </div>
+
+  <!-- Main Dashboard -->
+  <div id="mainDash">
+    <div class="stats-strip">
+      <div class="stat-item" onclick="showTab('schools')"><div class="stat-num" id="sSchools">0</div><div class="stat-lbl">Schools</div></div>
+      <div class="stat-item" onclick="showTab('pending')"><div class="stat-num red" id="sPending">0</div><div class="stat-lbl">Pending</div></div>
+      <div class="stat-item" onclick="openM('createModal')"><div class="stat-num green">+</div><div class="stat-lbl">New School</div></div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab-item active" id="tab-schools" onclick="showTab('schools')">🏫 Schools</div>
+      <div class="tab-item" id="tab-pending" onclick="showTab('pending')">⏳ Pending</div>
+    </div>
+    <div class="dash-content">
+      <div id="c-schools">
+        <p class="sec-head">Registered Schools</p>
+        <button class="new-btn" onclick="openM('createModal')">+ Register New School</button>
+        <div id="schoolsList"></div>
+      </div>
+      <div id="c-pending" class="hide">
+        <p class="sec-head">Pending Students</p>
+        <div id="pendingList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- School Detail View -->
+  <div id="schoolDetail">
+    <div class="dash-content">
+      <div id="detailContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE SCHOOL MODAL -->
+<div id="createModal" class="modal-overlay">
+<div class="modal">
+  <span class="back-link" onclick="closeM('createModal')">← Cancel</span>
+  <h2 class="modal-title">Register New School</h2>
+  <p class="sec-label">SCHOOL INFORMATION</p>
+  <label class="lbl">School Name *</label><input id="csName" class="inp" placeholder="e.g. Greenview Academy">
+  <label class="lbl">Category *</label>
+  <div class="pills">
+    <div class="pill on" onclick="selPill(this,'csCat')" data-v="secondary">Secondary</div>
+    <div class="pill" onclick="selPill(this,'csCat')" data-v="primary">Primary</div>
+    <div class="pill" onclick="selPill(this,'csCat')" data-v="nursery">Nursery</div>
+    <div class="pill" onclick="selPill(this,'csCat')" data-v="highschool">High School</div>
+    <div class="pill" onclick="selPill(this,'csCat')" data-v="university">University</div>
+    <div class="pill" onclick="selPill(this,'csCat')" data-v="technical">Technical</div>
+  </div><input type="hidden" id="csCat" value="secondary">
+  <label class="lbl">Subsystem</label>
+  <div class="toggle-row">
+    <div class="toggle-btn on" onclick="selToggle(this,'csSub','en')">🇬🇧 English</div>
+    <div class="toggle-btn" onclick="selToggle(this,'csSub','fr')">🇫🇷 French</div>
+  </div><input type="hidden" id="csSub" value="en">
+  <label class="lbl">Address</label><input id="csAddr" class="inp" placeholder="Street address">
+  <label class="lbl">Phone</label><input id="csPh" class="inp" type="tel" placeholder="+237 6XX XXX XXX">
+  <label class="lbl">School Email</label><input id="csEmail" class="inp" type="email" placeholder="info@school.com">
+  <label class="lbl">School Motto</label><input id="csMotto" class="inp" placeholder="e.g. Excellence Through Knowledge">
+  <label class="lbl">Location</label><input id="csLoc" class="inp" placeholder="e.g. Yaoundé, Cameroon">
+  <p class="sec-label">PRINCIPAL / ADMIN INFORMATION</p>
+  <label class="lbl">Principal Name</label><input id="csPName" class="inp" placeholder="Full name">
+  <label class="lbl">Principal Phone</label><input id="csPPh" class="inp" type="tel" placeholder="+237 6XX XXX XXX">
+  <label class="lbl">Principal Email * (credentials sent here)</label><input id="csPEmail" class="inp" type="email" placeholder="principal@email.com">
+  <button class="btn-primary" onclick="createSchool()">Register School</button>
+</div></div>
+
+<script>
+const API='https://elegant-eagerness-production-2114.up.railway.app';
+let token='',schools=[],pending=[],currentSchool=null;
+
+function showToast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type;t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
+function saveSession(){try{localStorage.setItem('supersa_s',JSON.stringify({token}));}catch{}}
+function loadSession(){try{const s=localStorage.getItem('supersa_s');if(s){const{token:t}=JSON.parse(s);token=t;showDash();loadSchools();loadPending();return true;}}catch{}return false;}
+
+async function doLogin(){
+  const em=document.getElementById('lEmail').value,pw=document.getElementById('lPwd').value;
+  if(!em||!pw){showToast('Enter email and password','err');return;}
+  try{
+    const r=await fetch(`${API}/auth/super/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,password:pw})});
+    const d=await r.json();
+    if(!r.ok){showToast(d.error||'Login failed','err');return;}
+    token=d.token;saveSession();showDash();loadSchools();loadPending();
+  }catch{showToast('Cannot connect to server','err');}
+}
+
+function showDash(){document.getElementById('loginScreen').style.display='none';document.getElementById('dashboard').style.display='block';}
+function signOut(){token='';try{localStorage.removeItem('supersa_s');}catch{};document.getElementById('dashboard').style.display='none';document.getElementById('loginScreen').style.display='flex';}
+
+async function loadSchools(){
+  try{const r=await fetch(`${API}/auth/super/schools`,{headers:{Authorization:`Bearer ${token}`}});const d=await r.json();schools=d.schools||[];document.getElementById('sSchools').textContent=schools.length;renderSchools();}catch{}
+}
+async function loadPending(){
+  try{const r=await fetch(`${API}/auth/super/pending-students`,{headers:{Authorization:`Bearer ${token}`}});const d=await r.json();pending=d.students||[];document.getElementById('sPending').textContent=pending.length;renderPending();}catch{}
+}
+
+function renderSchools(){
+  const l=document.getElementById('schoolsList');
+  if(!schools.length){l.innerHTML='<div class="empty-state"><div class="empty-icon">🏫</div><div class="empty-txt">No schools registered yet.</div></div>';return;}
+  l.innerHTML=schools.map(s=>`
+    <div class="school-card">
+      <div class="school-card-row">
+        <div class="school-dot" style="background:${s.theme_primary||'#1B5E3B'}"></div>
+        <div style="flex:1">
+          <div class="school-name">${s.name}</div>
+          <div class="school-sub">${s.category} · ${(s.subsystem||'').toUpperCase()}</div>
+          <div class="school-meta">${s.student_count||0} students · ${s.class_count||0} classes</div>
+        </div>
+        <div class="school-actions">
+          <button class="view-btn" onclick="viewSchool('${s.id}','${s.name}','${s.theme_primary||'#1B5E3B'}')">View Data</button>
+          <div class="del-btn" onclick="delSchool('${s.id}','${s.name}')">🗑️</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderPending(){
+  const l=document.getElementById('pendingList');
+  if(!pending.length){l.innerHTML='<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-txt">No pending students.<br>All approved.</div></div>';return;}
+  l.innerHTML=pending.map(s=>`<div class="pending-card"><div class="list-avatar">${s.name?.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()||'?'}</div><div style="flex:1"><div style="font-size:15px;font-weight:700;color:var(--navy)">${s.name}</div><div style="font-size:12px;color:var(--grey)">${s.school_name} · ${s.class_name}</div></div><button class="approve-btn" onclick="approveStudent('${s.id}','${s.name}')">Approve</button></div>`).join('');
+}
+
+function showTab(t){['schools','pending'].forEach(x=>{document.getElementById('c-'+x).classList.toggle('hide',x!==t);document.getElementById('tab-'+x).classList.toggle('active',x===t);});}
+
+// ── School Detail View ──
+async function viewSchool(id, name, color){
+  currentSchool = {id, name, color};
+  document.getElementById('mainDash').style.display='none';
+  document.getElementById('schoolDetail').style.display='block';
+  document.getElementById('hdrBack').style.display='flex';
+  document.getElementById('hdrTitle').textContent=name;
+  document.getElementById('hdrSub').textContent='School Data Overview';
+
+  const el=document.getElementById('detailContent');
+  el.innerHTML=`
+    <div class="detail-school-badge" style="border-left-color:${color}">
+      <div class="detail-school-name">${name}</div>
+      <div class="detail-school-sub">Full school data overview</div>
+    </div>
+    <div class="detail-tabs">
+      <div class="detail-tab active" onclick="loadDetailTab(this,'students','${id}')">👥 Students</div>
+      <div class="detail-tab" onclick="loadDetailTab(this,'attendance','${id}')">📅 Attendance</div>
+      <div class="detail-tab" onclick="loadDetailTab(this,'academic','${id}')">📚 Grades</div>
+      <div class="detail-tab" onclick="loadDetailTab(this,'homework','${id}')">📝 Homework</div>
+      <div class="detail-tab" onclick="loadDetailTab(this,'sports','${id}')">🏃 Sports</div>
+      <div class="detail-tab" onclick="loadDetailTab(this,'announce','${id}')">📢 News</div>
+      <div class="detail-tab" onclick="loadDetailTab(this,'alerts','${id}')">🚨 Alerts</div>
+    </div>
+    <div id="detailTabContent"><div class="spinner"></div></div>
+  `;
+  loadDetailTab(el.querySelector('.detail-tab.active'), 'students', id);
+}
+
+function backToDash(){
+  document.getElementById('mainDash').style.display='block';
+  document.getElementById('schoolDetail').style.display='none';
+  document.getElementById('hdrBack').style.display='none';
+  document.getElementById('hdrTitle').textContent='👑 Super Admin';
+  document.getElementById('hdrSub').textContent='EducAid Platform Management';
+  currentSchool=null;
+}
+
+async function loadDetailTab(el, tab, schoolId){
+  document.querySelectorAll('.detail-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const c=document.getElementById('detailTabContent');
+  c.innerHTML='<div class="spinner"></div>';
+
+  if(tab==='students') await loadSchoolStudents(schoolId, c);
+  else if(tab==='attendance') await loadSchoolAttendance(schoolId, c);
+  else if(tab==='academic') await loadSchoolAcademic(schoolId, c);
+  else if(tab==='homework') await loadSchoolHomework(schoolId, c);
+  else if(tab==='sports') await loadSchoolSports(schoolId, c);
+  else if(tab==='announce') await loadSchoolAnnounce(schoolId, c);
+  else if(tab==='alerts') await loadSchoolAlerts(schoolId, c);
+}
+
+// ── Load students grouped by class ──
+async function loadSchoolStudents(schoolId, c){
+  try{
+    const [sr, cr] = await Promise.all([
+      fetch(`${API}/schools/${schoolId}/students`,{headers:{Authorization:`Bearer ${token}`}}),
+      fetch(`${API}/schools/${schoolId}/classes`,{headers:{Authorization:`Bearer ${token}`}})
+    ]);
+    const students=(await sr.json()).students||[];
+    const classes=(await cr.json()).classes||[];
+
+    if(!students.length){c.innerHTML=empty('👥','No students registered yet.');return;}
+
+    // Group students by class
+    const grouped={};
+    const noClass=[];
+    students.forEach(s=>{
+      if(s.class_name){
+        if(!grouped[s.class_name])grouped[s.class_name]=[];
+        grouped[s.class_name].push(s);
+      }else noClass.push(s);
+    });
+
+    let html='';
+    Object.entries(grouped).sort().forEach(([cls,sts])=>{
+      html+=`<div class="class-group">
+        <div class="class-group-header" onclick="toggleClass(this)">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--navy)"></div>
+          <div class="class-group-name">${cls}</div>
+          <div class="class-group-count">${sts.length} student${sts.length!==1?'s':''}</div>
+          <div style="color:var(--grey-mid);margin-left:8px">▼</div>
+        </div>
+        <div class="class-group-body">
+          ${sts.map(s=>`
+            <div class="student-row" onclick="toggleStudentDetail(this,'${s.id}')">
+              <div class="st-avatar">${s.initials||s.name[0]}</div>
+              <div style="flex:1">
+                <div class="st-name">${s.name}</div>
+                <div class="st-code">${s.student_code||'Pending'} ${s.sex?'· '+s.sex:''} ${s.date_of_birth?'· DOB: '+s.date_of_birth.slice(0,10):''}</div>
+              </div>
+              <div class="st-expand">›</div>
+            </div>
+            <div class="student-detail" id="sd-${s.id}">
+              <div class="detail-item"><span class="detail-item-label">Full Name</span><span class="detail-item-value">${s.name}</span></div>
+              <div class="detail-item"><span class="detail-item-label">Student ID</span><span class="detail-item-value">${s.student_code||'Pending'}</span></div>
+              <div class="detail-item"><span class="detail-item-label">Class</span><span class="detail-item-value">${s.class_name||'—'}</span></div>
+              <div class="detail-item"><span class="detail-item-label">Sex</span><span class="detail-item-value">${s.sex||'—'}</span></div>
+              <div class="detail-item"><span class="detail-item-label">Date of Birth</span><span class="detail-item-value">${s.date_of_birth?s.date_of_birth.slice(0,10):'—'}</span></div>
+              <div class="detail-item"><span class="detail-item-label">Religion</span><span class="detail-item-value">${s.religion||'—'}</span></div>
+              <div class="detail-item"><span class="detail-item-label">Parent</span><span class="detail-item-value">${s.parent_name||'—'}</span></div>
+              <div class="detail-item"><span class="detail-item-label">Parent Phone</span><span class="detail-item-value">${s.parent_phone||'—'}</span></div>
+              <div class="detail-item"><span class="detail-item-label">Email</span><span class="detail-item-value">${s.student_email||'—'}</span></div>
+              <div class="detail-item"><span class="detail-item-label">Status</span><span class="detail-item-value" style="color:${s.is_active?'var(--green)':'var(--amber)'}">${s.is_active?'Active':'Pending Approval'}</span></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    });
+    if(noClass.length){
+      html+=`<div class="class-group"><div class="class-group-header"><div class="class-group-name">Unassigned</div><div class="class-group-count">${noClass.length}</div></div><div class="class-group-body">${noClass.map(s=>`<div class="student-row"><div class="st-avatar">${s.initials||s.name[0]}</div><div><div class="st-name">${s.name}</div><div class="st-code">${s.student_code||'Pending'}</div></div></div>`).join('')}</div></div>`;
+    }
+    c.innerHTML=html;
+  }catch{c.innerHTML=empty('👥','Failed to load students.');}
+}
+
+function toggleClass(hdr){
+  const body=hdr.nextElementSibling;
+  const arrow=hdr.querySelector('div:last-child');
+  const isHidden=body.style.display==='none';
+  body.style.display=isHidden?'block':'none';
+  arrow.textContent=isHidden?'▼':'▶';
+}
+
+function toggleStudentDetail(row, sid){
+  const detail=document.getElementById('sd-'+sid);
+  const arrow=row.querySelector('.st-expand');
+  const isOpen=detail.classList.contains('open');
+  detail.classList.toggle('open',!isOpen);
+  arrow.textContent=isOpen?'›':'▾';
+}
+
+// ── Load attendance grouped by class ──
+async function loadSchoolAttendance(schoolId, c){
+  try{
+    const r=await fetch(`${API}/schools/${schoolId}/attendance/all`,{headers:{Authorization:`Bearer ${token}`}});
+    const att=(await r.json()).attendance||[];
+    if(!att.length){c.innerHTML=empty('📅','No attendance records yet.');return;}
+    // Group by class then date
+    const grouped={};
+    att.forEach(a=>{const cls=a.class_name||'Unassigned';if(!grouped[cls])grouped[cls]=[];grouped[cls].push(a);});
+    let html='';
+    Object.entries(grouped).sort().forEach(([cls,rows])=>{
+      html+=`<div style="font-size:12px;font-weight:700;color:var(--navy);padding:8px 12px;background:var(--navy-light);border-radius:10px;margin-bottom:8px;border:1px solid var(--border)">${cls}</div>`;
+      rows.forEach(a=>{
+        const sc=a.status==='present'?'#1B5E3B':a.status==='absent'?'#B91C1C':a.status==='late'?'#B45309':'#1D4ED8';
+        html+=`<div class="data-card" style="border-left-color:${sc}"><div style="flex:1"><div class="card-title">${a.student_name}</div><div class="card-sub">${a.date}</div></div><span class="badge" style="color:${sc};background:${sc}15;border-color:${sc}33">${(a.status||'').toUpperCase()}</span></div>`;
+      });
+    });
+    c.innerHTML=html;
+  }catch{c.innerHTML=empty('📅','Failed to load.');}
+}
+
+// ── Load academic grouped by class ──
+async function loadSchoolAcademic(schoolId, c){
+  try{
+    const r=await fetch(`${API}/schools/${schoolId}/academic/all`,{headers:{Authorization:`Bearer ${token}`}});
+    const reports=(await r.json()).reports||[];
+    if(!reports.length){c.innerHTML=empty('📚','No academic reports yet.');return;}
+    const grouped={};
+    reports.forEach(r=>{const cls=r.class_name||'Unassigned';if(!grouped[cls])grouped[cls]=[];grouped[cls].push(r);});
+    let html='';
+    Object.entries(grouped).sort().forEach(([cls,rows])=>{
+      html+=`<div style="font-size:12px;font-weight:700;color:var(--navy);padding:8px 12px;background:var(--navy-light);border-radius:10px;margin-bottom:8px;border:1px solid var(--border)">${cls}</div>`;
+      rows.forEach(r=>{html+=`<div class="data-card" style="border-left-color:#0C1F4A"><div style="flex:1"><div class="card-title">${r.student_name} — ${r.subject}</div><div class="card-sub">${r.term}</div>${r.remarks?`<div style="font-size:11px;color:#374151;margin-top:3px">${r.remarks}</div>`:''}</div><div class="grade-box"><div class="grade-num">${r.score||'-'}</div><div class="grade-letter">${r.grade||''}</div></div></div>`;});
+    });
+    c.innerHTML=html;
+  }catch{c.innerHTML=empty('📚','Failed to load.');}
+}
+
+// ── Load homework grouped by class ──
+async function loadSchoolHomework(schoolId, c){
+  try{
+    const r=await fetch(`${API}/schools/${schoolId}/homework/all`,{headers:{Authorization:`Bearer ${token}`}});
+    const hw=(await r.json()).homework||[];
+    if(!hw.length){c.innerHTML=empty('📝','No homework posted yet.');return;}
+    const grouped={};
+    hw.forEach(h=>{const cls=h.class_name||'All Classes';if(!grouped[cls])grouped[cls]=[];grouped[cls].push(h);});
+    let html='';
+    Object.entries(grouped).sort().forEach(([cls,rows])=>{
+      html+=`<div style="font-size:12px;font-weight:700;color:var(--navy);padding:8px 12px;background:var(--navy-light);border-radius:10px;margin-bottom:8px;border:1px solid var(--border)">${cls}</div>`;
+      rows.forEach(r=>{html+=`<div class="data-card" style="border-left-color:#6D28D9"><div style="flex:1"><div class="card-title">${r.subject}</div><div class="card-sub">Due: ${r.due_date||'No date set'}</div>${r.description?`<div style="font-size:11px;color:#374151;margin-top:3px">${r.description}</div>`:''}</div></div>`;});
+    });
+    c.innerHTML=html;
+  }catch{c.innerHTML=empty('📝','Failed to load.');}
+}
+
+// ── Load sports grouped by class ──
+async function loadSchoolSports(schoolId, c){
+  try{
+    const r=await fetch(`${API}/schools/${schoolId}/sports/all`,{headers:{Authorization:`Bearer ${token}`}});
+    const sp=(await r.json()).assessments||[];
+    if(!sp.length){c.innerHTML=empty('🏃','No sports assessments yet.');return;}
+    const grouped={};
+    sp.forEach(s=>{const cls=s.class_name||'Unassigned';if(!grouped[cls])grouped[cls]=[];grouped[cls].push(s);});
+    let html='';
+    Object.entries(grouped).sort().forEach(([cls,rows])=>{
+      html+=`<div style="font-size:12px;font-weight:700;color:var(--navy);padding:8px 12px;background:var(--navy-light);border-radius:10px;margin-bottom:8px;border:1px solid var(--border)">${cls}</div>`;
+      rows.forEach(r=>{
+        const rc=r.rating==='excellent'?'#1B5E3B':r.rating==='good'?'#0C1F4A':r.rating==='average'?'#B45309':'#B91C1C';
+        html+=`<div class="data-card" style="border-left-color:#B45309"><div style="flex:1"><div class="card-title">${r.student_name} — ${r.sport_label||r.sport}</div><div class="card-sub">${r.term}</div></div><span class="badge" style="color:${rc};background:${rc}15;border-color:${rc}33">${(r.rating||'').replace('_',' ').toUpperCase()}</span></div>`;
+      });
+    });
+    c.innerHTML=html;
+  }catch{c.innerHTML=empty('🏃','Failed to load.');}
+}
+
+// ── Load announcements grouped by class ──
+async function loadSchoolAnnounce(schoolId, c){
+  try{
+    const r=await fetch(`${API}/schools/${schoolId}/announcements/all`,{headers:{Authorization:`Bearer ${token}`}});
+    const ann=(await r.json()).announcements||[];
+    if(!ann.length){c.innerHTML=empty('📢','No announcements yet.');return;}
+    const grouped={};
+    ann.forEach(a=>{const cls=a.class_name||'All Classes';if(!grouped[cls])grouped[cls]=[];grouped[cls].push(a);});
+    let html='';
+    Object.entries(grouped).sort().forEach(([cls,rows])=>{
+      html+=`<div style="font-size:12px;font-weight:700;color:var(--navy);padding:8px 12px;background:var(--navy-light);border-radius:10px;margin-bottom:8px;border:1px solid var(--border)">${cls}</div>`;
+      rows.forEach(r=>{html+=`<div class="data-card" style="border-left-color:#0E7490"><div style="flex:1"><div class="card-title">${r.text}</div><div class="card-sub">${(r.created_at||'').slice(0,10)}</div></div></div>`;});
+    });
+    c.innerHTML=html;
+  }catch{c.innerHTML=empty('📢','Failed to load.');}
+}
+
+// ── Load alerts grouped by class ──
+async function loadSchoolAlerts(schoolId, c){
+  try{
+    const r=await fetch(`${API}/schools/${schoolId}/alerts/all`,{headers:{Authorization:`Bearer ${token}`}});
+    const alerts=(await r.json()).alerts||[];
+    if(!alerts.length){c.innerHTML=empty('🚨','No alerts yet.');return;}
+    const grouped={};
+    alerts.forEach(a=>{const cls=a.class_name||'Unassigned';if(!grouped[cls])grouped[cls]=[];grouped[cls].push(a);});
+    let html='';
+    Object.entries(grouped).sort().forEach(([cls,rows])=>{
+      html+=`<div style="font-size:12px;font-weight:700;color:var(--navy);padding:8px 12px;background:var(--navy-light);border-radius:10px;margin-bottom:8px;border:1px solid var(--border)">${cls}</div>`;
+      rows.forEach(r=>{html+=`<div class="data-card" style="border-left-color:#B91C1C"><div style="flex:1"><div class="card-title">${r.student_name} — ${r.title}</div>${r.description?`<div style="font-size:11px;color:#374151;margin-top:3px">${r.description}</div>`:''}<div class="card-sub">${(r.created_at||'').slice(0,10)}</div></div></div>`;});
+    });
+    c.innerHTML=html;
+  }catch{c.innerHTML=empty('🚨','Failed to load.');}
+}
+
+function empty(icon,msg){return `<div class="empty-state"><div class="empty-icon">${icon}</div><div class="empty-txt">${msg}</div></div>`;}
+
+// ── School actions ──
+async function delSchool(id,name){
+  if(!confirm(`Delete "${name}"? This will permanently delete all data.`))return;
+  try{const r=await fetch(`${API}/schools/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});if(r.ok){showToast(`${name} deleted`);loadSchools();}else showToast('Failed','err');}catch{showToast('Error','err');}
+}
+async function approveStudent(id,name){
+  try{const r=await fetch(`${API}/auth/super/approve-student/${id}`,{method:'POST',headers:{Authorization:`Bearer ${token}`}});const d=await r.json();if(r.ok){showToast(`${name} approved! ID: ${d.studentCode}`);loadPending();loadSchools();}else showToast(d.error||'Failed','err');}catch{showToast('Error','err');}
+}
+async function createSchool(){
+  const name=document.getElementById('csName').value,pEmail=document.getElementById('csPEmail').value;
+  if(!name||!pEmail){showToast('School name and principal email required','err');return;}
+  try{
+    const r=await fetch(`${API}/auth/super/create-school`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({name,category:document.getElementById('csCat').value,subsystem:document.getElementById('csSub').value,address:document.getElementById('csAddr').value,phone:document.getElementById('csPh').value,email:document.getElementById('csEmail').value,motto:document.getElementById('csMotto').value,location:document.getElementById('csLoc').value,principalName:document.getElementById('csPName').value,principalPhone:document.getElementById('csPPh').value,principalEmail:pEmail})});
+    const d=await r.json();
+    if(!r.ok){showToast(d.error||'Failed','err');return;}
+    showToast(`${name} registered!`);closeM('createModal');loadSchools();
+    ['csName','csAddr','csPh','csEmail','csMotto','csLoc','csPName','csPPh','csPEmail'].forEach(id=>document.getElementById(id).value='');
+  }catch{showToast('Error','err');}
+}
+
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+window.addEventListener('click',e=>{document.querySelectorAll('.modal-overlay.open').forEach(m=>{if(e.target===m)closeM(m.id);});});
+function selPill(el,hid){const p=el.parentElement;p.querySelectorAll('.pill').forEach(x=>x.classList.remove('on'));el.classList.add('on');document.getElementById(hid).value=el.dataset.v;}
+function selToggle(el,hid,val){el.parentElement.querySelectorAll('.toggle-btn').forEach(x=>x.classList.remove('on'));el.classList.add('on');document.getElementById(hid).value=val;}
+
+window.onload=()=>{if(!loadSession()){}}
+</script>
+</body>
+</html>
